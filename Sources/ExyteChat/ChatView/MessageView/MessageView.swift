@@ -138,8 +138,64 @@ struct MessageView: View {
                         .padding(.trailing, 12)
                 }
             }
+
+            if let toolInfo = message.toolInfo {
+                toolView(toolInfo)
+            }
         }
         .bubbleBackground(message, theme: theme)
+    }
+
+    @ViewBuilder
+    func toolView(_ toolInfo: Message.ToolInfo) -> some View {
+        switch toolInfo.status {
+        case .waitingForConfirmation:
+            HStack {
+                Button(action: toolInfo.onAccept) {
+                    Label(
+                        title: { Text("Submit") },
+                        icon: {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(Color.green)
+                        }
+                    )
+                }
+                .buttonStyle(BorderedButtonStyle())
+
+                Spacer()
+
+                Button(action: toolInfo.onDecline) {
+                    Label(
+                        title: { Text("Decline") },
+                        icon: {
+                            Image(systemName: "xmark")
+                                .foregroundColor(Color.red)
+                        }
+                    )
+                }
+                .buttonStyle(BorderedButtonStyle())
+            }
+            .padding(8)
+        case .confirmed:
+            HStack {
+                Image(systemName: "checkmark")
+                    .foregroundColor(Color.green)
+
+                Text("Submitted")
+            }
+            .frame(maxWidth: .infinity)
+            .padding(8)
+
+        case .declined:
+            HStack {
+                Image(systemName: "xmark")
+                    .foregroundColor(Color.red)
+
+                Text("Declined")
+            }
+            .frame(maxWidth: .infinity)
+            .padding(8)
+        }
     }
 
     @ViewBuilder
@@ -311,7 +367,8 @@ struct MessageView_Preview: PreviewProvider {
             Attachment.randomImage(),
             Attachment.randomImage(),
             Attachment.randomImage(),
-        ]
+        ],
+        toolInfo: .init(toolId: "test", status: .declined, onAccept: {}, onDecline: {})
     )
 
     static private var message = Message(

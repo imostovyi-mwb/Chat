@@ -9,6 +9,41 @@ import SwiftUI
 
 public struct Message: Identifiable, Hashable {
 
+    public struct ToolInfo: Hashable, Equatable {
+
+        public init(
+            toolId: String,
+            status: Status,
+            onAccept: @escaping () -> Void,
+            onDecline: @escaping () -> Void
+        ) {
+            self.toolId = toolId
+            self.status = status
+            self.onAccept = onAccept
+            self.onDecline = onDecline
+        }
+
+        public enum Status {
+            case waitingForConfirmation
+            case confirmed
+            case declined
+        }
+
+        public let toolId: String
+        public let status: Status
+        public let onAccept: () -> Void
+        public let onDecline: () -> Void
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(toolId)
+            hasher.combine(status)
+        }
+
+        public static func == (lhs: ToolInfo, rhs: ToolInfo) -> Bool {
+            lhs.toolId == rhs.toolId && lhs.status == rhs.status
+        }
+    }
+
     public enum Status: Equatable, Hashable {
         case sending
         case sent
@@ -53,6 +88,7 @@ public struct Message: Identifiable, Hashable {
     public var attachments: [Attachment]
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
+    public var toolInfo: ToolInfo?
 
     public init(id: String,
                 user: User,
@@ -61,8 +97,8 @@ public struct Message: Identifiable, Hashable {
                 text: String = "",
                 attachments: [Attachment] = [],
                 recording: Recording? = nil,
-                replyMessage: ReplyMessage? = nil) {
-
+                replyMessage: ReplyMessage? = nil,
+                toolInfo: ToolInfo? = nil) {
         self.id = id
         self.user = user
         self.status = status
@@ -71,6 +107,7 @@ public struct Message: Identifiable, Hashable {
         self.attachments = attachments
         self.recording = recording
         self.replyMessage = replyMessage
+        self.toolInfo = toolInfo
     }
 
     public static func makeMessage(
