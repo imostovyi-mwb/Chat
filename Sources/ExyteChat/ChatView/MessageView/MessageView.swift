@@ -150,33 +150,37 @@ struct MessageView: View {
     func toolView(_ toolInfo: Message.ToolInfo) -> some View {
         switch toolInfo.status {
         case .waitingForConfirmation:
-            HStack {
-                Spacer()
-
+            HStack(alignment: .center, spacing: 8) {
                 Button(action: toolInfo.onAccept) {
-                    Label(
-                        title: { Text("Submit") },
-                        icon: {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(Color.green)
-                        }
-                    )
+                    HStack {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(Color.green)
+                        Text("Submit")
+                    }
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 6)
                 }
-                .buttonStyle(BorderedButtonStyle())
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.gray.opacity(0.6), lineWidth: 1)
+                )
+
 
                 Button(action: toolInfo.onDecline) {
-                    Label(
-                        title: { Text("Decline") },
-                        icon: {
-                            Image(systemName: "xmark")
-                                .foregroundColor(Color.red)
-                        }
-                    )
+                    HStack {
+                        Image(systemName: "xmark")
+                            .foregroundColor(Color.red)
+                        Text("Decline")
+                    }
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 6)
                 }
-                .buttonStyle(BorderedButtonStyle())
-
-                Spacer()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.gray.opacity(0.6), lineWidth: 1)
+                )
             }
+            .frame(maxWidth: .infinity, alignment: .center)
             .padding(8)
         case .confirmed:
             HStack {
