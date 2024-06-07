@@ -16,7 +16,10 @@ struct MessageRow: Equatable {
     let positionInGroup: PositionInGroup
 
     static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.id == rhs.id && lhs.positionInGroup == rhs.positionInGroup && lhs.message.status == rhs.message.status
+        lhs.id == rhs.id 
+            && lhs.positionInGroup == rhs.positionInGroup 
+            && lhs.message.status == rhs.message.status
+            && lhs.message.toolInfo == rhs.message.toolInfo
     }
 }
 
