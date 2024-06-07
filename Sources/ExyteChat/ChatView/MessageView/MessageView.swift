@@ -151,6 +151,8 @@ struct MessageView: View {
         switch toolInfo.status {
         case .waitingForConfirmation:
             HStack {
+                Spacer()
+
                 Button(action: toolInfo.onAccept) {
                     Label(
                         title: { Text("Submit") },
@@ -162,8 +164,6 @@ struct MessageView: View {
                 }
                 .buttonStyle(BorderedButtonStyle())
 
-                Spacer()
-
                 Button(action: toolInfo.onDecline) {
                     Label(
                         title: { Text("Decline") },
@@ -174,6 +174,8 @@ struct MessageView: View {
                     )
                 }
                 .buttonStyle(BorderedButtonStyle())
+
+                Spacer()
             }
             .padding(8)
         case .confirmed:
