@@ -29,7 +29,7 @@ struct MessageView: View {
     static let widthWithMedia: CGFloat = 204
     static let horizontalAvatarPadding: CGFloat = 8
     static let horizontalTextPadding: CGFloat = 12
-    static let horizontalAttachmentPadding: CGFloat = 1 // for multiple attachments
+    static let horizontalAttachmentPadding: CGFloat = 4 // for multiple attachments
     static let statusViewSize: CGFloat = 14
     static let horizontalStatusPadding: CGFloat = 8
     static let horizontalBubblePadding: CGFloat = 70
@@ -123,6 +123,7 @@ struct MessageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if !message.attachments.isEmpty {
                 attachmentsView(message)
+                    .padding(8)
             }
 
             if !message.text.isEmpty {
@@ -254,11 +255,6 @@ struct MessageView: View {
         AttachmentsGrid(attachments: message.attachments) {
             viewModel.presentAttachmentFullScreen($0)
         }
-        .applyIf(message.attachments.count > 1) {
-            $0
-                .padding(.top, MessageView.horizontalAttachmentPadding)
-                .padding(.horizontal, MessageView.horizontalAttachmentPadding)
-        }
         .overlay(alignment: .bottomTrailing) {
             if message.text.isEmpty {
                 messageTimeView(needsCapsule: true)
@@ -339,12 +335,11 @@ extension View {
     @ViewBuilder
     func bubbleBackground(_ message: Message, theme: ChatTheme, isReply: Bool = false) -> some View {
         let radius: CGFloat = !message.attachments.isEmpty ? 12 : 20
-        let additionalMediaInset: CGFloat = message.attachments.count > 1 ? 2 : 0
         self
-            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
+            .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + 16)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
-                if isReply || !message.text.isEmpty || message.recording != nil {
+                if isReply || !message.text.isEmpty || message.recording != nil || !message.attachments.isEmpty {
                     RoundedRectangle(cornerRadius: radius)
                         .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
                         .opacity(isReply ? 0.5 : 1)
@@ -377,6 +372,16 @@ struct MessageView_Preview: PreviewProvider {
         toolInfo: .init(toolId: "test", status: .declined, onAccept: {}, onDecline: {})
     )
 
+    static private var replyedMessage2 = Message(
+        id: UUID().uuidString,
+        user: stan,
+        status: .read,
+        text: "",
+        attachments: [
+            Attachment.randomImage(),
+        ]
+    )
+
     static private var message = Message(
         id: UUID().uuidString,
         user: stan,
@@ -389,18 +394,33 @@ struct MessageView_Preview: PreviewProvider {
         ZStack {
             Color.yellow.ignoresSafeArea()
 
-            MessageView(
-                viewModel: ChatViewModel(),
-                message: replyedMessage,
-                positionInGroup: .single,
-                chatType: .chat,
-                avatarSize: 32,
-                tapAvatarClosure: nil,
-                messageUseMarkdown: false,
-                isDisplayingMessageMenu: false,
-                showMessageTimeView: true,
-                font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
-            )
+            VStack {
+                MessageView(
+                    viewModel: ChatViewModel(),
+                    message: replyedMessage,
+                    positionInGroup: .single,
+                    chatType: .chat,
+                    avatarSize: 32,
+                    tapAvatarClosure: nil,
+                    messageUseMarkdown: false,
+                    isDisplayingMessageMenu: false,
+                    showMessageTimeView: true,
+                    font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+                )
+
+                MessageView(
+                    viewModel: ChatViewModel(),
+                    message: replyedMessage2,
+                    positionInGroup: .single,
+                    chatType: .chat,
+                    avatarSize: 32,
+                    tapAvatarClosure: nil,
+                    messageUseMarkdown: false,
+                    isDisplayingMessageMenu: false,
+                    showMessageTimeView: true,
+                    font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
+                )
+            }
         }
     }
 }
